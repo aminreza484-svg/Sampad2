@@ -8,9 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Create icon data file
+        run: |
+          cat > icon_b64.txt << 'EOF'
+          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
+          EOF
       - name: Create project files
         run: |
-          mkdir -p app/src/main/assets app/src/main/res/values app/src/main/java/com/sampad/app
+          mkdir -p app/src/main/assets app/src/main/res/values app/src/main/java/com/sampad/app app/src/main/res/mipmap-hdpi
           cat > build.gradle << 'EOF'
           plugins {
               id 'com.android.application' version '8.6.1' apply false
@@ -32,14 +37,19 @@ jobs:
 
           android {
               namespace 'com.sampad.app'
-              compileSdk 34
+              compileSdk 35
 
               defaultConfig {
                   applicationId 'com.sampad.app'
                   minSdk 23
-                  targetSdk 34
+                  targetSdk 35
                   versionCode 1
                   versionName '1.0'
+              }
+
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_1_8
+                  targetCompatibility JavaVersion.VERSION_1_8
               }
           }
 
@@ -49,9 +59,16 @@ jobs:
           cat > app/src/main/AndroidManifest.xml << 'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+              <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+              <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+              <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
               <application
                   android:theme="@style/AppTheme"
                   android:label="برنامه‌ی درسی من"
+                  android:icon="@mipmap/ic_launcher"
+                  android:roundIcon="@mipmap/ic_launcher_round"
                   android:usesCleartextTraffic="true"
                   android:resizeableActivity="true">
                   <activity
@@ -63,6 +80,14 @@ jobs:
                           <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
                   </activity>
+
+                  <receiver android:name=".AlarmReceiver" android:exported="false" />
+                  <receiver android:name=".DoneActionReceiver" android:exported="false" />
+                  <receiver android:name=".BootReceiver" android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.BOOT_COMPLETED" />
+                      </intent-filter>
+                  </receiver>
               </application>
           </manifest>
           EOF
@@ -83,7 +108,10 @@ jobs:
           package com.sampad.app;
 
           import android.app.Activity;
+          import android.app.AlertDialog;
           import android.os.Bundle;
+          import android.webkit.JsResult;
+          import android.webkit.WebChromeClient;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
@@ -111,8 +139,40 @@ jobs:
                   s.setLoadWithOverviewMode(false);
                   s.setUseWideViewPort(false);
 
+                  webView.addJavascriptInterface(new NotifyBridge(this), "AndroidBridge");
+
                   webView.setWebViewClient(new WebViewClient());
+                  webView.setWebChromeClient(new WebChromeClient() {
+                      @Override
+                      public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
+                          new AlertDialog.Builder(MainActivity.this)
+                                  .setMessage(message)
+                                  .setPositiveButton("باشه", (d, w) -> result.confirm())
+                                  .setCancelable(false)
+                                  .show();
+                          return true;
+                      }
+
+                      @Override
+                      public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
+                          new AlertDialog.Builder(MainActivity.this)
+                                  .setMessage(message)
+                                  .setPositiveButton("بله", (d, w) -> result.confirm())
+                                  .setNegativeButton("خیر", (d, w) -> result.cancel())
+                                  .setCancelable(false)
+                                  .show();
+                          return true;
+                      }
+                  });
                   webView.loadUrl("file:///android_asset/index.html");
+              }
+
+              @Override
+              protected void onResume() {
+                  super.onResume();
+                  if (webView != null) {
+                      webView.evaluateJavascript("if(window.applyPendingDoneFromNative) applyPendingDoneFromNative();", null);
+                  }
               }
 
               @Override
@@ -122,7 +182,391 @@ jobs:
               }
           }
           EOF
+          cat > app/src/main/java/com/sampad/app/Notif.java << 'EOF'
+          package com.sampad.app;
+
+          import android.app.AlarmManager;
+          import android.app.Notification;
+          import android.app.NotificationChannel;
+          import android.app.NotificationManager;
+          import android.app.PendingIntent;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.SharedPreferences;
+          import android.os.Build;
+
+          import org.json.JSONArray;
+          import org.json.JSONObject;
+
+          import java.text.ParseException;
+          import java.text.SimpleDateFormat;
+          import java.util.ArrayList;
+          import java.util.Calendar;
+          import java.util.Locale;
+
+          public class Notif {
+              static final String CHANNEL_ID = "sampad_reminders";
+              static final String PREFS = "sampad_notif_prefs";
+              static final int DAILY_HW_REQUEST_CODE = 90001;
+              static final int DAILY_HW_NOTIF_ID = 90001;
+
+              static SharedPreferences prefs(Context ctx) {
+                  return ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+              }
+
+              static void ensureChannel(Context ctx) {
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                      NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                      NotificationChannel ch = nm.getNotificationChannel(CHANNEL_ID);
+                      if (ch == null) {
+                          ch = new NotificationChannel(CHANNEL_ID, "یادآوری برنامه درسی", NotificationManager.IMPORTANCE_HIGH);
+                          ch.setDescription("یادآوری امتحان‌ها و تکالیف");
+                          nm.createNotificationChannel(ch);
+                      }
+                  }
+              }
+
+              static int piFlags() {
+                  return PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
+              }
+
+              static void showExamNotification(Context ctx, int notifId, String title, String text) {
+                  ensureChannel(ctx);
+                  Notification.Builder b = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                          ? new Notification.Builder(ctx, CHANNEL_ID)
+                          : new Notification.Builder(ctx);
+                  b.setSmallIcon(android.R.drawable.ic_dialog_info)
+                          .setContentTitle(title)
+                          .setContentText(text)
+                          .setStyle(new Notification.BigTextStyle().bigText(text))
+                          .setAutoCancel(true)
+                          .setPriority(Notification.PRIORITY_HIGH);
+
+                  Intent openIntent = new Intent(ctx, MainActivity.class);
+                  openIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                  PendingIntent openPi = PendingIntent.getActivity(ctx, notifId, openIntent, piFlags());
+                  b.setContentIntent(openPi);
+
+                  NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                  nm.notify(notifId, b.build());
+              }
+
+              static void showDailyHwNotification(Context ctx) {
+                  SharedPreferences p = prefs(ctx);
+                  String json = p.getString("tomorrow_hw_json", "[]");
+                  try {
+                      JSONArray arr = new JSONArray(json);
+                      if (arr.length() == 0) return;
+                      StringBuilder sb = new StringBuilder();
+                      for (int i = 0; i < arr.length(); i++) {
+                          JSONObject o = arr.getJSONObject(i);
+                          if (i > 0) sb.append("، ");
+                          sb.append(o.optString("subject"));
+                      }
+                      String bodyText = "فردا باید این درسا رو انجام بدی: " + sb;
+
+                      ensureChannel(ctx);
+                      Notification.Builder b = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                              ? new Notification.Builder(ctx, CHANNEL_ID)
+                              : new Notification.Builder(ctx);
+                      b.setSmallIcon(android.R.drawable.ic_dialog_info)
+                              .setContentTitle("تکالیف فردا")
+                              .setContentText(bodyText)
+                              .setStyle(new Notification.BigTextStyle().bigText(bodyText))
+                              .setAutoCancel(true)
+                              .setPriority(Notification.PRIORITY_HIGH);
+
+                      Intent openIntent = new Intent(ctx, MainActivity.class);
+                      openIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                      PendingIntent openPi = PendingIntent.getActivity(ctx, DAILY_HW_NOTIF_ID, openIntent, piFlags());
+                      b.setContentIntent(openPi);
+
+                      Intent doneIntent = new Intent(ctx, DoneActionReceiver.class);
+                      PendingIntent donePi = PendingIntent.getBroadcast(ctx, DAILY_HW_NOTIF_ID, doneIntent, piFlags());
+                      b.addAction(android.R.drawable.checkbox_on_background, "بله حل کرده‌ام", donePi);
+
+                      NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                      nm.notify(DAILY_HW_NOTIF_ID, b.build());
+                  } catch (Exception ignored) {
+                  }
+              }
+
+              static void scheduleAlarm(Context ctx, int requestCode, Calendar when, Intent intent) {
+                  AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+                  PendingIntent pi = PendingIntent.getBroadcast(ctx, requestCode, intent, piFlags());
+                  try {
+                      am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, when.getTimeInMillis(), pi);
+                  } catch (SecurityException se) {
+                      try {
+                          am.set(AlarmManager.RTC_WAKEUP, when.getTimeInMillis(), pi);
+                      } catch (Exception ignored) {
+                      }
+                  }
+              }
+
+              static void cancelAlarm(Context ctx, int requestCode) {
+                  AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+                  Intent it = new Intent(ctx, AlarmReceiver.class);
+                  PendingIntent pi = PendingIntent.getBroadcast(ctx, requestCode, it, piFlags());
+                  am.cancel(pi);
+              }
+
+              // ---- امتحان‌ها ----
+              static void scheduleExamAlarms(Context ctx, String examsJson) {
+                  SharedPreferences p = prefs(ctx);
+
+                  try {
+                      JSONArray oldCodes = new JSONArray(p.getString("scheduled_exam_codes", "[]"));
+                      for (int i = 0; i < oldCodes.length(); i++) {
+                          cancelAlarm(ctx, oldCodes.getInt(i));
+                      }
+                  } catch (Exception ignored) {
+                  }
+
+                  ArrayList<Integer> newCodes = new ArrayList<>();
+                  SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                  Calendar now = Calendar.getInstance();
+
+                  try {
+                      JSONArray exams = new JSONArray(examsJson);
+                      for (int i = 0; i < exams.length(); i++) {
+                          JSONObject ex = exams.getJSONObject(i);
+                          String id = ex.optString("id");
+                          String subject = ex.optString("subject");
+                          String dateStr = ex.optString("date");
+                          if (id.isEmpty() || dateStr.isEmpty()) continue;
+
+                          Calendar examDay;
+                          try {
+                              java.util.Date d = fmt.parse(dateStr);
+                              examDay = Calendar.getInstance();
+                              examDay.setTime(d);
+                          } catch (ParseException pe) {
+                              continue;
+                          }
+
+                          int base = (id.hashCode() & 0xFFFFFF) * 10;
+
+                          int[] daysBefore = {5, 4, 3};
+                          for (int k = 0; k < daysBefore.length; k++) {
+                              Calendar remind = (Calendar) examDay.clone();
+                              remind.add(Calendar.DAY_OF_YEAR, -daysBefore[k]);
+                              remind.set(Calendar.HOUR_OF_DAY, 17);
+                              remind.set(Calendar.MINUTE, 0);
+                              remind.set(Calendar.SECOND, 0);
+                              remind.set(Calendar.MILLISECOND, 0);
+                              if (remind.after(now)) {
+                                  int code = base + k;
+                                  Intent it = new Intent(ctx, AlarmReceiver.class);
+                                  it.putExtra("type", "exam_reminder");
+                                  it.putExtra("subject", subject);
+                                  it.putExtra("daysLeft", daysBefore[k]);
+                                  it.putExtra("notifId", code);
+                                  scheduleAlarm(ctx, code, remind, it);
+                                  newCodes.add(code);
+                              }
+                          }
+
+                          Calendar examMorning = (Calendar) examDay.clone();
+                          examMorning.set(Calendar.HOUR_OF_DAY, 7);
+                          examMorning.set(Calendar.MINUTE, 0);
+                          examMorning.set(Calendar.SECOND, 0);
+                          examMorning.set(Calendar.MILLISECOND, 0);
+                          if (examMorning.after(now)) {
+                              int code = base + 9;
+                              Intent it = new Intent(ctx, AlarmReceiver.class);
+                              it.putExtra("type", "exam_day");
+                              it.putExtra("subject", subject);
+                              it.putExtra("notifId", code);
+                              scheduleAlarm(ctx, code, examMorning, it);
+                              newCodes.add(code);
+                          }
+                      }
+                  } catch (Exception ignored) {
+                  }
+
+                  JSONArray codesArr = new JSONArray(newCodes);
+                  p.edit()
+                          .putString("exams_json", examsJson)
+                          .putString("scheduled_exam_codes", codesArr.toString())
+                          .apply();
+              }
+
+              // ---- تکالیف فردا ----
+              static void syncTomorrowHomework(Context ctx, String hwJson) {
+                  prefs(ctx).edit().putString("tomorrow_hw_json", hwJson).apply();
+                  ensureDailyAlarm(ctx);
+              }
+
+              static void ensureDailyAlarm(Context ctx) {
+                  Calendar next = Calendar.getInstance();
+                  next.set(Calendar.HOUR_OF_DAY, 20);
+                  next.set(Calendar.MINUTE, 0);
+                  next.set(Calendar.SECOND, 0);
+                  next.set(Calendar.MILLISECOND, 0);
+                  if (!next.after(Calendar.getInstance())) {
+                      next.add(Calendar.DAY_OF_YEAR, 1);
+                  }
+                  Intent it = new Intent(ctx, AlarmReceiver.class);
+                  it.putExtra("type", "daily_hw");
+                  scheduleAlarm(ctx, DAILY_HW_REQUEST_CODE, next, it);
+              }
+
+              static void rescheduleAllAfterBoot(Context ctx) {
+                  SharedPreferences p = prefs(ctx);
+                  String exams = p.getString("exams_json", null);
+                  if (exams != null) scheduleExamAlarms(ctx, exams);
+                  ensureDailyAlarm(ctx);
+              }
+          }
+          EOF
+          cat > app/src/main/java/com/sampad/app/AlarmReceiver.java << 'EOF'
+          package com.sampad.app;
+
+          import android.content.BroadcastReceiver;
+          import android.content.Context;
+          import android.content.Intent;
+
+          public class AlarmReceiver extends BroadcastReceiver {
+              @Override
+              public void onReceive(Context context, Intent intent) {
+                  String type = intent.getStringExtra("type");
+                  if (type == null) return;
+
+                  if ("exam_reminder".equals(type)) {
+                      String subject = intent.getStringExtra("subject");
+                      int daysLeft = intent.getIntExtra("daysLeft", 0);
+                      int notifId = intent.getIntExtra("notifId", (int) System.currentTimeMillis());
+                      String text = daysLeft + " روز تا امتحان " + subject;
+                      Notif.showExamNotification(context, notifId, "یادآوری امتحان", text);
+                  } else if ("exam_day".equals(type)) {
+                      String subject = intent.getStringExtra("subject");
+                      int notifId = intent.getIntExtra("notifId", (int) System.currentTimeMillis());
+                      Notif.showExamNotification(context, notifId, "امروز امتحان " + subject + " داری", "آرزوی موفقیت 🌿");
+                  } else if ("daily_hw".equals(type)) {
+                      Notif.showDailyHwNotification(context);
+                      // زنگ فردا رو هم از همین‌جا تنظیم کن تا هر روز خودش تکرار بشه
+                      Notif.ensureDailyAlarm(context);
+                  }
+              }
+          }
+          EOF
+          cat > app/src/main/java/com/sampad/app/DoneActionReceiver.java << 'EOF'
+          package com.sampad.app;
+
+          import android.app.NotificationManager;
+          import android.content.BroadcastReceiver;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.SharedPreferences;
+
+          import org.json.JSONArray;
+          import org.json.JSONObject;
+
+          public class DoneActionReceiver extends BroadcastReceiver {
+              @Override
+              public void onReceive(Context context, Intent intent) {
+                  SharedPreferences p = Notif.prefs(context);
+                  String hwJson = p.getString("tomorrow_hw_json", "[]");
+                  try {
+                      JSONArray hw = new JSONArray(hwJson);
+                      JSONArray ids = new JSONArray();
+                      for (int i = 0; i < hw.length(); i++) {
+                          JSONObject o = hw.getJSONObject(i);
+                          ids.put(o.optString("id"));
+                      }
+                      // با هر آیدی جدید، به لیست منتظرها اضافه می‌کنیم (اگه از قبل چیزی مونده بود)
+                      JSONArray pending = new JSONArray(p.getString("pending_done_ids", "[]"));
+                      for (int i = 0; i < ids.length(); i++) pending.put(ids.get(i));
+                      p.edit().putString("pending_done_ids", pending.toString()).apply();
+                  } catch (Exception ignored) {
+                  }
+
+                  NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                  nm.cancel(Notif.DAILY_HW_NOTIF_ID);
+              }
+          }
+          EOF
+          cat > app/src/main/java/com/sampad/app/BootReceiver.java << 'EOF'
+          package com.sampad.app;
+
+          import android.content.BroadcastReceiver;
+          import android.content.Context;
+          import android.content.Intent;
+
+          public class BootReceiver extends BroadcastReceiver {
+              @Override
+              public void onReceive(Context context, Intent intent) {
+                  if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+                      Notif.rescheduleAllAfterBoot(context);
+                  }
+              }
+          }
+          EOF
+          cat > app/src/main/java/com/sampad/app/NotifyBridge.java << 'EOF'
+          package com.sampad.app;
+
+          import android.app.Activity;
+          import android.app.AlarmManager;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.SharedPreferences;
+          import android.net.Uri;
+          import android.os.Build;
+          import android.webkit.JavascriptInterface;
+
+          public class NotifyBridge {
+              private final Activity activity;
+
+              NotifyBridge(Activity activity) {
+                  this.activity = activity;
+              }
+
+              @JavascriptInterface
+              public void scheduleExamAlarms(String examsJson) {
+                  Notif.scheduleExamAlarms(activity, examsJson);
+              }
+
+              @JavascriptInterface
+              public void syncTomorrowHomework(String hwJson) {
+                  Notif.syncTomorrowHomework(activity, hwJson);
+              }
+
+              @JavascriptInterface
+              public String getPendingDoneIds() {
+                  SharedPreferences p = Notif.prefs(activity);
+                  String ids = p.getString("pending_done_ids", "[]");
+                  p.edit().remove("pending_done_ids").apply();
+                  return ids;
+              }
+
+              @JavascriptInterface
+              public void requestPermissions() {
+                  activity.runOnUiThread(() -> {
+                      if (Build.VERSION.SDK_INT >= 33) {
+                          if (activity.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                                  != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                              activity.requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
+                          }
+                      }
+                      if (Build.VERSION.SDK_INT >= 31) {
+                          AlarmManager am = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+                          if (am != null && !am.canScheduleExactAlarms()) {
+                              try {
+                                  Intent it = new Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                                  it.setData(Uri.parse("package:" + activity.getPackageName()));
+                                  activity.startActivity(it);
+                              } catch (Exception ignored) {
+                              }
+                          }
+                      }
+                  });
+              }
+          }
+          EOF
           cp index.html app/src/main/assets/index.html
+          base64 -d icon_b64.txt > app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp app/src/main/res/mipmap-hdpi/ic_launcher.png app/src/main/res/mipmap-hdpi/ic_launcher_round.png
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
