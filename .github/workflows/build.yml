@@ -16,12 +16,12 @@ jobs:
       - name: Create project files
         run: |
           mkdir -p app/src/main/assets app/src/main/res/values app/src/main/java/com/sampad/app app/src/main/res/mipmap-hdpi
-          cat > build.gradle << 'EOF'
+          cat > build.gradle << 'PROJFILEEOF'
           plugins {
               id 'com.android.application' version '8.6.1' apply false
           }
-          EOF
-          cat > settings.gradle << 'EOF'
+          PROJFILEEOF
+          cat > settings.gradle << 'PROJFILEEOF'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
           dependencyResolutionManagement {
               repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -29,8 +29,8 @@ jobs:
           }
           rootProject.name = "SampadAPK"
           include(":app")
-          EOF
-          cat > app/build.gradle << 'EOF'
+          PROJFILEEOF
+          cat > app/build.gradle << 'PROJFILEEOF'
           plugins {
               id 'com.android.application'
           }
@@ -55,8 +55,8 @@ jobs:
 
           dependencies {
           }
-          EOF
-          cat > app/src/main/AndroidManifest.xml << 'EOF'
+          PROJFILEEOF
+          cat > app/src/main/AndroidManifest.xml << 'PROJFILEEOF'
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -90,8 +90,8 @@ jobs:
                   </receiver>
               </application>
           </manifest>
-          EOF
-          cat > app/src/main/res/values/styles.xml << 'EOF'
+          PROJFILEEOF
+          cat > app/src/main/res/values/styles.xml << 'PROJFILEEOF'
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
               <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
@@ -103,8 +103,8 @@ jobs:
                   <item name="android:windowLightStatusBar">false</item>
               </style>
           </resources>
-          EOF
-          cat > app/src/main/java/com/sampad/app/MainActivity.java << 'EOF'
+          PROJFILEEOF
+          cat > app/src/main/java/com/sampad/app/MainActivity.java << 'PROJFILEEOF'
           package com.sampad.app;
 
           import android.app.Activity;
@@ -181,8 +181,8 @@ jobs:
                   else super.onBackPressed();
               }
           }
-          EOF
-          cat > app/src/main/java/com/sampad/app/Notif.java << 'EOF'
+          PROJFILEEOF
+          cat > app/src/main/java/com/sampad/app/Notif.java << 'PROJFILEEOF'
           package com.sampad.app;
 
           import android.app.AlarmManager;
@@ -334,6 +334,7 @@ jobs:
                           String id = ex.optString("id");
                           String subject = ex.optString("subject");
                           String dateStr = ex.optString("date");
+                          String kind = ex.optString("kind", "exam");
                           if (id.isEmpty() || dateStr.isEmpty()) continue;
 
                           Calendar examDay;
@@ -360,6 +361,7 @@ jobs:
                                   Intent it = new Intent(ctx, AlarmReceiver.class);
                                   it.putExtra("type", "exam_reminder");
                                   it.putExtra("subject", subject);
+                                  it.putExtra("kind", kind);
                                   it.putExtra("daysLeft", daysBefore[k]);
                                   it.putExtra("notifId", code);
                                   scheduleAlarm(ctx, code, remind, it);
@@ -377,6 +379,7 @@ jobs:
                               Intent it = new Intent(ctx, AlarmReceiver.class);
                               it.putExtra("type", "exam_day");
                               it.putExtra("subject", subject);
+                              it.putExtra("kind", kind);
                               it.putExtra("notifId", code);
                               scheduleAlarm(ctx, code, examMorning, it);
                               newCodes.add(code);
@@ -419,8 +422,8 @@ jobs:
                   ensureDailyAlarm(ctx);
               }
           }
-          EOF
-          cat > app/src/main/java/com/sampad/app/AlarmReceiver.java << 'EOF'
+          PROJFILEEOF
+          cat > app/src/main/java/com/sampad/app/AlarmReceiver.java << 'PROJFILEEOF'
           package com.sampad.app;
 
           import android.content.BroadcastReceiver;
@@ -435,14 +438,20 @@ jobs:
 
                   if ("exam_reminder".equals(type)) {
                       String subject = intent.getStringExtra("subject");
+                      String kind = intent.getStringExtra("kind");
+                      boolean oral = "oral".equals(kind);
+                      String label = oral ? "پرسش شفاهی" : "امتحان";
                       int daysLeft = intent.getIntExtra("daysLeft", 0);
                       int notifId = intent.getIntExtra("notifId", (int) System.currentTimeMillis());
-                      String text = daysLeft + " روز تا امتحان " + subject;
-                      Notif.showExamNotification(context, notifId, "یادآوری امتحان", text);
+                      String text = daysLeft + " روز تا " + label + " " + subject;
+                      Notif.showExamNotification(context, notifId, "یادآوری " + label, text);
                   } else if ("exam_day".equals(type)) {
                       String subject = intent.getStringExtra("subject");
+                      String kind = intent.getStringExtra("kind");
+                      boolean oral = "oral".equals(kind);
+                      String label = oral ? "پرسش شفاهی" : "امتحان";
                       int notifId = intent.getIntExtra("notifId", (int) System.currentTimeMillis());
-                      Notif.showExamNotification(context, notifId, "امروز امتحان " + subject + " داری", "آرزوی موفقیت 🌿");
+                      Notif.showExamNotification(context, notifId, "امروز " + label + " " + subject + " داری", "آرزوی موفقیت 🌿");
                   } else if ("daily_hw".equals(type)) {
                       Notif.showDailyHwNotification(context);
                       // زنگ فردا رو هم از همین‌جا تنظیم کن تا هر روز خودش تکرار بشه
@@ -450,8 +459,8 @@ jobs:
                   }
               }
           }
-          EOF
-          cat > app/src/main/java/com/sampad/app/DoneActionReceiver.java << 'EOF'
+          PROJFILEEOF
+          cat > app/src/main/java/com/sampad/app/DoneActionReceiver.java << 'PROJFILEEOF'
           package com.sampad.app;
 
           import android.app.NotificationManager;
@@ -486,8 +495,8 @@ jobs:
                   nm.cancel(Notif.DAILY_HW_NOTIF_ID);
               }
           }
-          EOF
-          cat > app/src/main/java/com/sampad/app/BootReceiver.java << 'EOF'
+          PROJFILEEOF
+          cat > app/src/main/java/com/sampad/app/BootReceiver.java << 'PROJFILEEOF'
           package com.sampad.app;
 
           import android.content.BroadcastReceiver;
@@ -502,8 +511,8 @@ jobs:
                   }
               }
           }
-          EOF
-          cat > app/src/main/java/com/sampad/app/NotifyBridge.java << 'EOF'
+          PROJFILEEOF
+          cat > app/src/main/java/com/sampad/app/NotifyBridge.java << 'PROJFILEEOF'
           package com.sampad.app;
 
           import android.app.Activity;
@@ -563,8 +572,712 @@ jobs:
                   });
               }
           }
-          EOF
-          cp index.html app/src/main/assets/index.html
+          PROJFILEEOF
+          cat > app/src/main/assets/index.html << 'PROJFILEEOF'
+          <!DOCTYPE html>
+          <html lang="fa" dir="rtl">
+          <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+          <title>برنامه‌ی درسی من</title>
+          <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogItio2LHZhtin2YXZh+KAjNuMINiv2LHYs9uMINmF2YYiLCAic2hvcnRfbmFtZSI6ICLYr9ix2LPbjCDZhdmGIiwgInN0YXJ0X3VybCI6ICIuIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmNmY1ZjIiLCAidGhlbWVfY29sb3IiOiAiIzNkNmI1MiIsICJkaXIiOiAicnRsIiwgImxhbmciOiAiZmEiLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFNQUFBQURBQ0FZQUFBQlMzR3dIQUFBRVZrbEVRVlI0bk8zYmJWTGJTQlNHVVp1YWJaRkZrR1V3eXhtV01Td2lMSXo4U0pFaXdaTDEwYTN1MW52T1gxSkdwdTZqSzluSzlkS1p4K2VuOTliSFFEMXZMNi9YMXNmd1dkT0RNZXhjTG0yak9Qd1hHM3JtSEIzRFliL000TFBHVVNGVS95VUduejFxaDFEdHhRMCtKZFVLb2ZpTEdueHFLaDNDUThrWE0velVWbnJHaXRSazhHbWh4RGJZdlFFTVA2MlVtTDFkQVJoK1d0czdnNXNETVB6MFlzOHNiZ3JBOE5PYnJUTzVPZ0REVDYrMnpPYXFBQXcvdlZzN280c0RNUHlNWXMyc0xnckE4RE9hcFRON053RER6NmlXekc3UlJ5RmdOTE1CT1BzenVuc3pQQm1BNGVjczVtYlpKUkRSYmdiZzdNL1pUTTIwRFVDMEx3RTQrM05XdDJiYkJpRGFId0U0KzNOMmY4KzREVUMwM3dFNCs1UGk4NnpiQUVRVEFORWVMaGVYUCtUNW1Ia2JnR2dDSUpvQWlDWUFvbDNkQUpQTUJpQ2FBSWdtQUtJSmdHZ0NJSm9BaUNZQW9nbUFhQUlnbWdDSUpnQ2lDWUJvQWlDYUFJZ21BS0lKZ0dnQ0lKb0FpQ1lBb2dtQWFBSWcyait0RHlEQmovLytuL3padDMrL3ovNmJqNTlUaHdBS21odjAwcThwakRJRXNGS05JZDlpeVZiaFBnSGMwTXVRYjJWckxCY2R3T2lEdnBhdDhkWHBBMGdiOHExU3Q4WXBBakRrOVp4OWF3d1ZnRUh2eXhtMlJuY0JHUEx4amJRMWZCTk1OQUVRVFFCRUV3RFJCRUEwQVJCTkFFUVRBTkVFUURRQkVFMEFSQk1BMGJwN0dHNnAzaDZxbXJQMUFiK0U5OWlhRFVDMFlUZkFxR2VjTlJMZVkyczJBTkVFUURRQkVFMEFSQk1BMFFSQU5BRVFUUUJFRXdEUkJFQTBBUkJOQUVRVEFORUVRTFJoSDRkTytNOGlDZSt4TlJ1QWFNTnVnRkhQT0dza3ZNZldiQUNpQ1lCb0FpQ2FBSWdtQUtJSmdHZ0NJSm9BaUNZQW9nbUFhQUlnbWdDSUpnQ2lEZnMwYU1LejhnbnZzVFViZ0dqRGJvQlJ6emhySkx6SDFtd0FvZ21BYUFJZ21nQ0lKZ0NpQ1lCb0FpQ2FBSWdtQUtJSmdHZ0NJRnAzendMTlBRSHAyWmd4alBRVWEzY0J6Sm42d3dxampaRUdmY3BRQVV5eE5lbzV3NURQT1VVQWM4U3h6TmtIZmNycEE1aVRka21WT3VSem9nT1lNdnJXTU9qTENXQ2xYdUl3NUdVSW9LQWFsMVFHdmE3cjQvUFRlK3VEZ0ZaOEUwdzBBUkJOQUVRVEFORUVRRFFCRUUwQVJCTUEwUVJBTkFFUVRRQkVFd0RSQkVBMEFSQk5BRVFUQU5FRVFEUUJFRTBBUkJNQTBRUkF0SWUzbDlkcjY0T0FGdDVlWHE4MkFORUVRRFFCRUUwQVJIdTRYSDdkRExRK0VEalN4OHpiQUVRVEFORitCK0F5aUJTZlo5MEdJTm9mQWRnQ25OM2ZNMjRERU8xTEFMWUFaM1ZydG0wQW90ME13QmJnYktabTJnWWcybVFBdGdCbk1UZkxzeHRBQkl6dTNneTdCQ0xhM1FCc0FVYTFaSFlYYlFBUk1KcWxNN3Y0RWtnRWpHTE5ySzY2QnhBQnZWczdvNnR2Z2tWQXI3Yk01cVpQZ1VSQWI3Yk81T2FQUVVWQUwvYk00cTd2QVVSQWEzdG5jUGNYWVNLZ2xSS3pWM1I0SDUrZjNrdStIdHhTOHFSYjlGRUkyNERhU3M5WXRZRzFEU2lwMXNtMStobGJDT3hSKzZyaXNFc1dJYkRHVVpmVGgxK3pDNEU1Ujk5SE5yMXBGUU9YUzlzUFQ3cjcxRVlVNTliYko0VS9BYnJQT2I4WXNzKzBBQUFBQUVsRlRrU3VRbUNDIiwgInNpemVzIjogIjE5MngxOTIiLCAidHlwZSI6ICJpbWFnZS9wbmcifSwgeyJzcmMiOiAiZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFnQUFBQUlBQ0FZQUFBRDBlTlQ2QUFBTjNrbEVRVlI0bk8zY1VYSVRTUnFGMGJLRGJjRWltbVhBY21BWnNBaFlHUDFBdUZ0Z1NWWkpXWmwvNWozbmJTWW1Ka3Bwejl6UFdYWS9iWlQwL3RNL3YwWS9BMEFMUDc5K2Z4cjlETHptaXpLSWdRZjRUU0NNNGRBN01QWUErNGlDNHpuZ0F4aDhnTFlFUVhzT3RBR0REOUNYSUhpY0E3eVQwUWVvUVF6Y3g2SHRZUFFCYWhNRHQzTlFiekQ2QUhNU0E5YzVuQXNNUDhBYWhNQjVEdVdFMFFkWW14ajRuNFBZREQ5QUdpRVFIZ0NHSHlCYmNnaEVmbkRERDhDcHhCQ0krc0NHSDRCcmtrSWc0b01hZmdEMlNBaUI1OUVQY0RUakQ4QmVDZHV4Yk9Fa2ZQRUFPTjZxdHdITGZTakREOEFSVmd1QnBWNEJHSDhBanJMYXhpeFJNNnQ5VVFDb2JZWGJnT2x2QUl3L0FMMnRzRDFUQjhBS1h3QUE1alQ3QmsxNWhUSDdvUU93bGhsZkNVeDNBMkQ4QWFobXhtMmFLZ0JtUEdBQU1zeTJVVk5jV2N4MnFBQmttK0dWUVBrYkFPTVB3R3htMks3U0FURERBUUxBT2RVM3JHd0FWRDg0QUhoTDVTMHJHUUNWRHd3QTlxaTZhZVVDb09wQkFjQzlLbTVicVFDb2VFQUEwRUsxalNzVEFOVU9CZ0JhcTdSMUpRS2cwb0VBd0pHcWJON3dBS2h5RUFEUVM0WHRHeG9BRlE0QUFFWVl2WUhEQW1EMEJ3ZUEwVVp1NFpBQU1QNEE4TnVvVGV3ZUFNWWZBUDQwWWh1N0JvRHhCNER6ZW05a3R3QXcvZ0J3WGMrdDdCSUF4aDhBYnROck00Zi9jd0FBZ1A0T0R3QS8vUVBBUGoyMjg5QUFNUDRBY0orak4vU3dBREQrQVBDWUk3ZlU3d0FBUUtCREFzQlAvd0RReGxHYjJqd0FqRDhBdEhYRXRqWU5BT01QQU1kb3ZiRitCd0FBQWpVTEFELzlBOEN4V201dGt3QXcvZ0RRUjZ2TjlRb0FBQUk5SEFCKytnZUF2bHBzcnhzQUFBajBVQUQ0NlI4QXhuaDBnKzhPQU9NUEFHTTlzc1ZlQVFCQW9Mc0N3RS8vQUZERHZadnNCZ0FBQXUwT0FELzlBMEF0OTJ5ekd3QUFDTFFyQVB6MER3QTE3ZDFvTndBQUVPam1BUERUUHdEVXRtZXIzUUFBUUtDYkFzQlAvd0F3aDFzMzJ3MEFBQVFTQUFBUTZNMEFjUDBQQUhPNVpidmRBQUJBb0tzQjRLZC9BSmpUV3h2dUJnQUFBZ2tBQUFoME1RQmMvd1BBM0s1dHVSc0FBQWdrQUFBZzBOa0FjUDBQQUd1NHRPbHVBQUFna0FBQWdFQ3ZBc0QxUHdDczVkeTJ1d0VBZ0VBQ0FBQUNDUUFBQ1BSSEFIai9Ed0JyK252ajNRQUFRQ0FCQUFDQkJBQUFCUG92QUx6L0I0QzFuVzY5R3dBQUNDUUFBQ0NRQUFDQVFBSUFBQUk5YjV0ZkFBU0FGQytiN3dZQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZzBKTi9CZ0FBNUhFREFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJEbzNlZ0hBSTczNDh1M1AvNzFoODhmMy96UFhmclBBR3NRQUxDSXYwZit5UDgrY1FEekV3QXdtZFpEMy9JWmhBSE1Rd0JBVVJXR2ZpOWhBUE1RQUREUWpDTi9ENjhUb0I0QkFCMmtEUDA5M0JyQUdBSUFHakh5YlFrRE9KWUFnSjBNL1ZoZUowQWJBZ0F1TVBUemNXc0F0eE1BUkRQeUdZUUJ2Q1lBaUdEb09jZnJCSklKQUpaaTZHbkZyUUdyRXdCTXg4Z3prakJnRlFLQXNndzlNeEVHekVZQU1KeWhaMlYrejRDcUJBQmRHSGw0emEwQkl3a0FtakwwOERoaFFBOENnTHNZZXVqUDZ3UmFFZ0JjWk9SaEhtNE4yRXNBWU9oaFljS0FTd1JBQ0NNUG5QSTZBUUd3R0VNUFBNcXRRUVlCTUNsREQvUW1ETllpQUFvejhzQU12RTZZa3dBb3dOQURxM0pyVU5mejZBY0FBUG9UQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0IzbzErQVByNDhQbmo2RWVna1I5ZnZvMStoTE44ajYyajZ2Y1liYmtCQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUMrVFBBRVA2c2g2UDVIb081dUFFQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBQUNDUUFBQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDdlJ2OUFQVHg0ZlBIMFk5QUl6KytmQnY5Q0dmNUhsdEgxZTh4Mm5JREFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFOG1lQUlmeFpEMGZ6UFFaemNRTUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUhlalg0QSt2ancrZVBvUjZDUkgxKytqWDZFczN5UHJhUHE5eGh0dVFFQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUw1TThBUS9xeUhvL2tlZzdtNEFRQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlOQzcwUS9BdG4zNC9QSHN2Ly9qeTdmT1R3TFExcVgvZjJNOEFWRFl0Zi9oaUFPZ0NpTS9Kd0V3S2JjR1FHK0dmaTBDWURIQ0FIaVVvYzhnQUVKNG5RQ2NNdklJQU53YXdNSU1QWmNJQUM1eWF3RHpNUFRzSlFDNGkxc0Q2TS9JMDVJQW9DbGhBSTh6OVBRZ0FPakM2d1I0emRBemtnQmdPTGNHck16SVU1VUFvQ3hod0V3TVBiTVJBRXpINndSR012U3NRZ0N3RkxjR3RHTG9XWjBBSUlJdzRCd2pUeklCUURTdkV6SVllbmhOQU1BRmJnM21ZK2poZGdJQWRoSUdZeGw1YUVNQVFDTmVKN1JsNk9GWUFnQTZjR3R3bWFHSE1RUUFESlJ5YTJEa29SNEJBRVhOZUd0ZzZHRWVBZ0FtVXlFTUREM01Ud0RBSWxxL1RqRHlzTGFuOTUvKytUWDZJUUNBdnA1SFB3QUEwSjhBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBQUNDUUFBQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFqMy8vUHI5YWZSREFBRDkvUHo2L2NrTkFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFLRG5iZnY5OTRDakh3UUFPTjdMNXJzQkFJQkFBZ0FBQWdrQUFBZ2tBQUFnMEg4QjRCY0JBV0J0cDF2dkJnQUFBZ2tBQUFna0FBQWcwQjhCNFBjQUFHQk5mMis4R3dBQUNDUUFBQ0NRQUFDQVFLOEN3TzhCQU1CYXptMjdHd0FBQ0NRQUFDRFEyUUR3R2dBQTFuQnAwOTBBQUVBZ0FRQUFnUzRHZ05jQUFEQzNhMXZ1QmdBQUFna0FBQWgwTlFDOEJnQ0FPYjIxNFc0QUFDRFFtd0hnRmdBQTVuTExkcnNCQUlCQUFnQUFBdDBVQUY0REFNQWNidDFzTndBQUVPam1BSEFMQUFDMTdkbHFOd0FBRUdoWEFMZ0ZBSUNhOW02MEd3QUFDTFE3QU53Q0FFQXQ5Mnl6R3dBQUNIUlhBTGdGQUlBYTd0MWtOd0FBRU9qdUFIQUxBQUJqUGJMRkQ5MEFpQUFBR09QUkRmWUtBQUFDUFJ3QWJnRUFvSzhXMitzR0FBQUNOUWtBdHdBQTBFZXJ6VzEyQXlBQ0FPQllMYmZXS3dBQUNOUTBBTndDQU1BeFdtOXM4eHNBRVFBQWJSMnhyWWU4QWhBQkFOREdVWnZxZHdBQUlOQmhBZUFXQUFBZWMrU1dIbm9ESUFJQTRENUhiK2pocndCRUFBRHMwMk03L1E0QUFBVHFFZ0J1QVFEZ05yMDJzOXNOZ0FnQWdPdDZibVhYVndBaUFBRE82NzJSM1g4SFFBUUF3SjlHYk9PUVh3SVVBUUR3MjZoTkhQWlhBQ0lBZ0hRanQzRG9ud0dLQUFCU2pkN0E0ZjhjZ05FSEFBQzlWZGkrNFFHd2JUVU9BZ0I2cUxKNUpRSmcyK29jQ0FBY3BkTFdsUW1BYmF0MU1BRFFVcldOS3hVQTIxYnZnQURnVVJXM3JWd0FiRnZOZ3dLQWUxVGR0SklCc0cxMUR3d0FibFY1eThvR3dMYlZQamdBdUtiNmhwVU9nRzJyZjRBQThMY1p0cXY4QTU1Ni8rbWZYNk9mQVFBdW1XSDRYNVMvQVRnMTA4RUNrR1cyalpvcUFMWnR2Z01HWUgwemJ0TjBEM3pLS3dFQVJwcHgrRjlNZHdOd2F1YURCMkJ1czIvUTFBR3diZk4vQVFDWXp3cmJNLzBIT09XVkFBQkhXbUg0WDB4L0EzQnFwUzhNQUxXc3RqRkxmWmhUYmdNQWFHRzE0WCt4NUljNkpRUUF1TWVxdy85aXFWY0E1NnorQlFTZ3ZZVHRXUDREbm5JYkFNQTFDY1AvSXVhRG5oSUNBSnhLR3Y0WGNSLzRsQkFBeUpZNC9DOWlQL2dwSVFDUUpYbjRYOFFmd0NraEFMQTJ3LzgvQjNHQkdBQllnOUUvejZHOFFRZ0F6TW53WCtkd2RoQURBTFVaL2RzNXFEdUpBWUFhalA1OUhGb0RZZ0NnTDZQL09BZDRBRUVBMEpiQmI4K0JkaUFJQVBZeCtNZHp3SU9JQW9EZmpQMFlEcjBvZ1FDc3dzRFg5Qy9KMlJTRjZDcmJxUUFBQUFCSlJVNUVya0pnZ2c9PSIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIn1dfQ==">
+          <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAD8klEQVR4nO3aUVLUQABF0RnKbeEicBm4HFmGLEIWhh8WlsgkdJJOuvvlnF+sIbEuz8bkeunA/ePDa+trYLuXp+dr62tocgECPocWgR/2DUV8bkfFves3ETG37Bn3Lh8sZErsEfZd7Q8UM6X2aKXaT4iQ2aLWWldZaDGzVa2GNv1UCJk9bFnr1QstZvaypa1VQYuZva1tbHHQYuYoa1pbFLSYOdrS5oqDFjOtLGmvKGgx01ppg58GLWZ6UdJi9Uff0NJs0NaZ3nzW5GTQYqZXc206chDlZtDWmd5NNfohaDEzilutOnIQ5V3Q1pnR/N+shSaKoInyN2jHDUb1b7sWmiiCJsrd5eK4wfjeGrbQRBE0UQRNlKvzM0ksNFEETRRBE0XQRBE0UQRNFEETRdBEETRRBE0UQRNF0EQRNFEETRRBE0XQRBE0UQRNFEETRdBEETRRvrS+gCS/fvyc/NrX799m/8zb19lG0AvNRbvX54q9nKBv2CvatcRe7rRB9xbtWo4w70UHnRLtGmdd9eGDPnO0ayXHPkTQoj3O6LF3E7Ro+zdC7B6sEEXQRBE0UQRNFEETRdBEETRRBE0UQRNF0EQRNFG6eZejRC/vC8xZ+k5K4j21ZKGJMtRCj7QUpRLvqSULTRRBE0XQRBE0UQRNFEETRdBEETRRBE0UQRNF0EQRNFEETZSh3rZLfHc48Z5astBEGWqhR1qKUon31JKFJoqgiSJoogiaKIImiqCJImiiCJoogiaKoIkiaKIImihDvZyU+Kpl4j21ZKGJMtRCj7QUpRLvqSULTRRBE0XQRBE0UQRNFEETRdBEETRRBE0UQROlm0ffUy/peDTcl95fpuom6ClCb6P3cKd0H/SUub9wsZcbNdwpwwY9x6p/lBbulMigp6SHfpZo55wq6CmjhS7caYKe0fqcLtzlBL1SzVUXbj3X+8eH19YXAbV4UkgUQRNF0EQRNFEETRRBE0XQRBE0UQRNFEETRdBEETRRBE0UQRNF0EQRNFEETRRBE0XQRBE0Ue5enp6vrS8Canh5er5aaKIImiiCJsrd5fLn7NH6QmCLt4YtNFEETZS/QTt2MKp/27XQRBE0Ud4F7djBaP5v1kIT5UPQVppR3Gr15kKLmt5NNerIQZTJoK00vZprc3ahRU1vPmvSkYMonwZtpelFSYtFCy1qWittsPjIIWpaWdLeojO0qDna0uYW/1Ioao6yprVV/8shava2trHV/20navaypa0qUd4/PrzW+BzOrcZIVnmwYq3ZqlZD1UO01ixRewyrP/q21pTao5Vd47PW3LLn6B22puI+t6P+5W5yPBD3ObQ4fnZx3hV4hh5+f/oNxx0kpAM3P2MAAAAASUVORK5CYII=">
+          <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAEVklEQVR4nO3bbVLbSBSGUZuabZFFkGUwyxmWMSwiLIz8SJEiwZL10a3u1nvOX1JGpu6jK9nK9dKZx+en99bHQD1vL6/X1sfwWdODMexcLm2jOPwXG3rmHB3DYb/M4LPGUSFU/yUGnz1qh1DtxQ0+JdUKofiLGnxqKh3CQ8kXM/zUVnrGitRk8GmhxDbYvQEMP62UmL1dARh+Wts7g5sDMPz0Ys8sbgrA8NObrTO5OgDDT6+2zOaqAAw/vVs7o4sDMPyMYs2sLgrA8DOapTN7NwDDz6iWzG7RRyFgNLMBOPszunszPBmA4ecs5mbZJRDRbgbg7M/ZTM20DUC0LwE4+3NWt2bbBiDaHwE4+3N2f8+4DUC03wE4+5Pi86zbAEQTANEeLheXP+T5mHkbgGgCIJoAiCYAol3dAJPMBiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIg2j+tDyDBj//+n/zZt3+/z/6bj59ThwAKmhv00q8pjDIEsFKNId9iyVbhPgHc0MuQb2VrLBcdwOiDvpat8dXpA0gb8q1St8YpAjDk9Zx9awwVgEHvyxm2RncBGPLxjbQ1fBNMNAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0bp7GG6p3h6qmrP1Ab+E99iaDUC0YTfAqGecNRLeY2s2ANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQLRhH4dO+M8iCe+xNRuAaMNugFHPOGskvMfWbACiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiDfs0aMKz8gnvsTUbgGjDboBRzzhrJLzH1mwAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIFp3zwLNPQHp2ZgxjPQUa3cBzJn6wwqjjZEGfcpQAUyxNeo5w5DPOUUAc8SxzNkHfcrpA5iTdkmVOuRzogOYMvrWMOjLCWClXuIw5GUIoKAal1QGva7r4/PTe+uDgFZ8E0w0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRAtIe3l9dr64OAFt5eXq82ANEEQDQBEE0ARHu4XH7dDLQ+EDjSx8zbAEQTANF+B+AyiBSfZ90GINofAdgCnN3fM24DEO1LALYAZ3Vrtm0Aot0MwBbgbKZm2gYg2mQAtgBnMTfLsxtABIzu3gy7BCLa3QBsAUa1ZHYXbQARMJqlM7v4EkgEjGLNrK66BxABvVs7o6tvgkVAr7bM5qZPgURAb7bO5OaPQUVAL/bM4q7vAURAa3tncPcXYSKglRKzV3R4H5+f3ku+HtxS8qRb9FEI24DaSs9YtYG1DSip1sm1+hlbCOxR+6risEsWIbDGUZfTh1+zC4E5R99HNr1pFQOXS9sPT7r71EYU59bbJ4U/AbrPOb8Yss+0AAAAAElFTkSuQmCC">
+          <meta name="apple-mobile-web-app-capable" content="yes">
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+          <meta name="apple-mobile-web-app-title" content="درسی من">
+          <meta name="mobile-web-app-capable" content="yes">
+          <meta name="theme-color" content="#0c0f0d">
+          <style>
+          :root{
+            --bg:#0c0f0d; --card:#141917; --ink:#eaf2ec; --muted:#8aa196;
+            --accent:#34d399; --accent-soft:#132821; --line:#223029; --danger:#e08a7c;
+            box-sizing:border-box;
+            padding-top:env(safe-area-inset-top,0px);
+            padding-bottom:env(safe-area-inset-bottom,0px);
+          }
+          *{box-sizing:border-box}
+          html,body{height:100%}
+          body{
+            margin:0; background:var(--bg); color:var(--ink);
+            font-family:'Vazirmatn','Tahoma',sans-serif;
+            -webkit-font-smoothing:antialiased;
+          }
+          .wrap{max-width:640px;margin:0 auto;padding:18px 14px 40px}
+          h1{font-size:1.3rem;margin:6px 0 2px}
+          .sub{color:var(--muted);font-size:.85rem;margin:0 0 18px}
+          .tabs{display:flex;gap:6px;margin-bottom:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
+          .tab{flex:1;text-align:center;padding:9px 4px;border-radius:9px;cursor:pointer;font-size:.88rem;color:var(--muted);user-select:none;
+            transition:background .2s ease, color .2s ease, transform .08s ease;-webkit-tap-highlight-color:transparent}
+          .tab:active{transform:scale(.95)}
+          .tab.active{background:var(--accent);color:#06130d;font-weight:600}
+          .view-fade{animation:viewFadeIn .22s ease}
+          @keyframes viewFadeIn{
+            from{opacity:0;transform:translateY(8px)}
+            to{opacity:1;transform:translateY(0)}
+          }
+          .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+          .card h2{font-size:1rem;margin:0 0 10px}
+          label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:5px}
+          select,input[type=text],textarea{
+            width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;
+            background:var(--bg);color:var(--ink);font-family:inherit;font-size:.92rem;margin-bottom:10px
+          }
+          textarea{resize:vertical;min-height:60px}
+          button{
+            border:none;border-radius:9px;padding:10px 16px;font-size:.9rem;font-weight:600;
+            cursor:pointer;font-family:inherit;
+            transition:transform .08s ease, filter .08s ease, box-shadow .08s ease;
+            -webkit-tap-highlight-color:transparent;
+          }
+          button:active{transform:scale(.94);filter:brightness(.85)}
+          .btn-primary{background:var(--accent);color:#06130d;width:100%;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+          .btn-primary:active{box-shadow:0 0 0 rgba(0,0,0,.25);transform:translateY(1px) scale(.97)}
+          .btn-ghost{background:transparent;color:var(--accent);border:1px solid var(--accent);padding:6px 12px;font-size:.8rem}
+          .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);padding:5px 10px;font-size:.75rem}
+          .day-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+          .day-row .name{width:78px;flex-shrink:0;font-size:.85rem;color:var(--muted)}
+          .chips{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+          .chip{background:var(--accent-soft);color:var(--accent);border-radius:20px;padding:4px 10px;font-size:.78rem;display:flex;align-items:center;gap:6px}
+          .chip span{cursor:pointer;font-weight:700}
+          .date-row{display:flex;gap:6px}
+          .date-row input{flex:1;min-width:0;text-align:center;margin-bottom:10px}
+          .day-input{display:flex;gap:6px;flex-wrap:wrap}
+          .day-input input{margin:0;flex:1;min-width:90px}
+          .day-input select{margin:0;flex:0 0 100%}
+          .day-input button{white-space:nowrap;padding:9px 12px}
+          .day-block{margin-bottom:16px}
+          .day-title{font-weight:700;font-size:.95rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+          .day-title .today-badge{background:var(--accent);color:#fff;font-size:.65rem;padding:2px 8px;border-radius:20px;font-weight:600}
+          .subj-item{
+            display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+            background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:7px
+          }
+          .subj-item .sname{font-weight:600;font-size:.88rem}
+          .subj-item .hw{font-size:.82rem;color:var(--muted);margin-top:3px}
+          .subj-item .hw.empty{color:var(--muted);opacity:.6}
+          .subj-item .hw.done{color:var(--accent)}
+          .empty-note{color:var(--muted);font-size:.85rem;text-align:center;padding:20px 0}
+          .done-check{cursor:pointer;font-size:1.1rem;flex-shrink:0;transition:transform .08s ease;-webkit-tap-highlight-color:transparent}
+          .done-check:active{transform:scale(1.3)}
+          [onclick]{-webkit-tap-highlight-color:transparent}
+          span[onclick]{transition:transform .08s ease,opacity .08s ease;display:inline-block}
+          span[onclick]:active{transform:scale(1.25);opacity:.6}
+          .mode-row{display:flex;gap:6px;margin-bottom:6px}
+          .mode-row select{margin-bottom:0}
+          .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+          .modal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;max-width:340px;width:100%}
+          .modal p{margin:0 0 16px;font-size:.9rem;line-height:1.6}
+          .modal .row{display:flex;gap:8px}
+          .modal .row button{flex:1}
+          .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:20px;font-size:.85rem;z-index:60;max-width:85%;text-align:center}
+          </style>
+          </head>
+          <body>
+          <div class="wrap">
+            <h1>📚 برنامه‌ی درسی من</h1>
+            <p class="sub">برنامه هفتگی درس‌ها رو بچین، بعد تکالیف رو اضافه کن تا خودش سر جاشون بشینن.</p>
+
+            <div class="tabs">
+              <div class="tab active" data-tab="week">هفته</div>
+              <div class="tab" data-tab="add">تکلیف جدید</div>
+              <div class="tab" data-tab="schedule">برنامه درسی</div>
+              <div class="tab" data-tab="exams">امتحانات</div>
+              <div class="tab" data-tab="notes">یادداشت‌ها</div>
+            </div>
+
+            <div id="view-week"></div>
+
+            <div id="view-add" style="display:none">
+              <div class="card">
+                <h2>ثبت تکلیف جدید</h2>
+                <label>درس</label>
+                <select id="hwSubject"></select>
+                <label>متن تکلیف</label>
+                <textarea id="hwText" placeholder="مثلاً: حل تمرین‌های صفحه ۴۵"></textarea>
+                <button class="btn-primary" onclick="addHomework()">ثبت و جای‌گذاری خودکار</button>
+              </div>
+            </div>
+
+            <div id="view-schedule" style="display:none">
+              <div class="card">
+                <h2>برنامه هفتگی</h2>
+                <div id="scheduleEditor"></div>
+              </div>
+            </div>
+
+            <div id="view-exams" style="display:none">
+              <div class="card">
+                <h2>امتحان / پرسش شفاهی جدید</h2>
+                <label>نوع</label>
+                <select id="examKind">
+                  <option value="exam">امتحان</option>
+                  <option value="oral">پرسش شفاهی</option>
+                </select>
+                <label>درس</label>
+                <input type="text" id="examSubject" placeholder="مثلاً: ریاضی">
+                <label>تاریخ امتحان</label>
+                <div class="date-row">
+                  <input type="number" id="examDay" placeholder="روز (مثلا ۱۶)" min="1" max="31" inputmode="numeric">
+                  <input type="number" id="examMonth" placeholder="ماه (مثلا ۰۹)" min="1" max="12" inputmode="numeric">
+                  <input type="number" id="examYear" placeholder="سال (مثلا ۱۴۰۴)" min="1400" max="1450" inputmode="numeric">
+                </div>
+                <button class="btn-primary" onclick="addExam()">ثبت امتحان</button>
+              </div>
+              <div id="examList"></div>
+            </div>
+
+            <div id="view-notes" style="display:none"></div>
+          </div>
+
+          <script>
+          // ---- ساده‌ترین جایگزین برای confirm()/alert() که همیشه کار می‌کنه ----
+          function showConfirm(message, onYes){
+            const ov = document.createElement('div');
+            ov.className = 'overlay';
+            ov.innerHTML = `<div class="modal"><p>${escapeHtml(message)}</p>
+              <div class="row">
+                <button class="btn-ghost" id="confirmNo">خیر</button>
+                <button class="btn-primary" id="confirmYes">بله</button>
+              </div></div>`;
+            document.body.appendChild(ov);
+            ov.querySelector('#confirmNo').onclick = ()=> ov.remove();
+            ov.querySelector('#confirmYes').onclick = ()=>{ ov.remove(); onYes(); };
+          }
+          function showToast(message){
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = message;
+            document.body.appendChild(t);
+            setTimeout(()=> t.remove(), 2400);
+          }
+
+          // ---- ارتباط با نوتیف اندروید ----
+          function tomorrowDueList(){
+            const tomorrow = addDays(new Date(), 1);
+            const day = DAYS[persianDayIndex(tomorrow)];
+            const parity = parityOf(tomorrow);
+            const list = [];
+            (schedule[day]||[]).forEach(entry=>{
+              const subject = typeof entry==='string' ? entry : (parity===0 ? entry.alt[0] : entry.alt[1]);
+              const hw = homeworks.find(h=> h.day===day && h.subject===subject && !h.done);
+              if(hw) list.push({ id: hw.id, subject: subject, text: hw.text });
+            });
+            return list;
+          }
+          function syncNativeNotifications(){
+            if(!window.AndroidBridge) return;
+            try{ AndroidBridge.scheduleExamAlarms(JSON.stringify(exams)); }catch(e){}
+            try{ AndroidBridge.syncTomorrowHomework(JSON.stringify(tomorrowDueList())); }catch(e){}
+          }
+          function applyPendingDoneFromNative(){
+            if(!window.AndroidBridge) return;
+            try{
+              const idsJson = AndroidBridge.getPendingDoneIds();
+              const ids = JSON.parse(idsJson || '[]');
+              if(ids.length===0) return;
+              let changed = false;
+              homeworks.forEach(h=>{ if(ids.includes(h.id) && !h.done){ h.done = true; changed = true; } });
+              if(changed){ saveAll(); renderWeek(); showToast('تکالیف دیروز به‌عنوان انجام‌شده علامت خورد ✅'); }
+            }catch(e){}
+          }
+          if(window.AndroidBridge){
+            try{ AndroidBridge.requestPermissions(); }catch(e){}
+          }
+
+          const DAYS = ["شنبه","یکشنبه","دوشنبه","سه‌شنبه","چهارشنبه","پنجشنبه","جمعه"];
+          // JS getDay(): 0=Sun..6=Sat -> map to our index (0=Sat)
+          function persianDayIndex(date){ const g=date.getDay(); return (g+1)%7; }
+          function todayIndex(){ return persianDayIndex(new Date()); }
+
+          // این هفته (هفته‌ای که این صفحه ساخته شد) به عنوان هفته زوج (پاریتی ۰) در نظر گرفته شده:
+          // یکشنبه‌اش = پژوهش ، سه‌شنبه‌اش = تربیت بدنی
+          const REFERENCE_DATE = new Date(2026,8,27); // ۲۷ شهریور... یعنی تاریخ ساخت صفحه
+          function saturdayOfWeek(date){ const d=new Date(date); d.setHours(0,0,0,0); d.setDate(d.getDate()-persianDayIndex(d)); return d; }
+          function weeksSince(date){ const ref=saturdayOfWeek(REFERENCE_DATE), tgt=saturdayOfWeek(date); return Math.round((tgt-ref)/(7*86400000)); }
+          function parityOf(date){ return ((weeksSince(date)%2)+2)%2; }
+          function addDays(date,n){ const d=new Date(date); d.setDate(d.getDate()+n); return d; }
+
+          // هر آیتم برنامه یا یک رشته ساده‌ست، یا آبجکت {alt:[گزینه‌هفته‌زوج, گزینه‌هفته‌فرد]}
+          const DEFAULT_SCHEDULE = {
+            "شنبه": [],
+            "یکشنبه": [],
+            "دوشنبه": [],
+            "سه‌شنبه": [],
+            "چهارشنبه": [],
+            "پنجشنبه": [],
+            "جمعه": []
+          };
+
+          let schedule = load('schedule', null);
+          if(!schedule || DAYS.every(d=> !schedule[d] || schedule[d].length===0)){
+            schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+          }
+          DAYS.forEach(d=>{ if(!schedule[d]) schedule[d]=[]; });
+
+          let homeworks = load('homeworks', []); // {id, subject, text, day, createdAt, done}
+          let notes = load('notes', {}); // {subject: noteText}
+          let noteLocks = load('noteLocks', {}); // {subject: true/false}
+          let exams = load('exams', []); // {id, subject, date}
+
+          // ادغام درس‌های تکراری (مثلاً "ریاضی" و "ریاضیات" که یکی بودن)
+          function mergeSubjectName(oldName, newName){
+            let changed = false;
+            DAYS.forEach(d=>{
+              schedule[d] = schedule[d].map(e=>{
+                if(typeof e==='string'){
+                  if(e===oldName){ changed=true; return newName; }
+                  return e;
+                }
+                e.alt = e.alt.map(o=>{ if(o===oldName){ changed=true; return newName; } return o; });
+                return e;
+              });
+            });
+            homeworks.forEach(h=>{ if(h.subject===oldName){ h.subject=newName; changed=true; } });
+            if(notes[oldName]!==undefined){
+              notes[newName] = notes[newName] ? (notes[newName] + '\n' + notes[oldName]) : notes[oldName];
+              delete notes[oldName];
+              changed = true;
+            }
+            if(noteLocks[oldName]!==undefined){
+              noteLocks[newName] = noteLocks[newName] || noteLocks[oldName];
+              delete noteLocks[oldName];
+            }
+            return changed;
+          }
+          if(mergeSubjectName('ریاضیات','ریاضی')) saveAll();
+
+          function resolveDay(dayName, parity){
+            return schedule[dayName].map(e=> typeof e==='string' ? e : (parity===0? e.alt[0] : e.alt[1]));
+          }
+          function dayHasSubjectOption(dayName, subject){
+            return schedule[dayName].some(e=> typeof e==='string' ? e===subject : (e.alt[0]===subject || e.alt[1]===subject));
+          }
+          function entryLabel(e){
+            return typeof e==='string' ? e : `${e.alt[0]} / ${e.alt[1]} (متناوب)`;
+          }
+
+          function load(key, fallback){
+            try{ const v = localStorage.getItem('hwapp2_'+key); return v ? JSON.parse(v) : fallback; }
+            catch(e){ return fallback; }
+          }
+          function save(key, val){
+            try{ localStorage.setItem('hwapp2_'+key, JSON.stringify(val)); }catch(e){}
+          }
+          function saveAll(){ save('schedule', schedule); save('homeworks', homeworks); save('notes', notes); save('noteLocks', noteLocks); save('exams', exams); syncNativeNotifications(); }
+
+          // ---- Tabs ----
+          document.querySelectorAll('.tab').forEach(t=>{
+            t.addEventListener('click', ()=>{
+              document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+              t.classList.add('active');
+              ['week','add','schedule','exams','notes'].forEach(v=>{
+                const view = document.getElementById('view-'+v);
+                const show = (v===t.dataset.tab);
+                view.style.display = show ? 'block' : 'none';
+                if(show){ view.classList.remove('view-fade'); void view.offsetWidth; view.classList.add('view-fade'); }
+              });
+              if(t.dataset.tab==='add') renderSubjectSelect();
+              if(t.dataset.tab==='notes') renderNotes();
+              if(t.dataset.tab==='exams') renderExams();
+            });
+          });
+
+          // ---- تبدیل تاریخ شمسی/میلادی ----
+          function jdiv(a,b){ return ~~(a/b); }
+          function jmod(a,b){ return a - ~~(a/b)*b; }
+          function jalCal(jy){
+            const breaks=[-61,9,38,199,426,686,756,818,1111,1181,1210,1635,2060,2097,2192,2262,2324,2394,2456,3178];
+            const bl=breaks.length, gy=jy+621;
+            let leapJ=-14, jp=breaks[0], jm, jump, leap, n, i;
+            for(i=1;i<bl;i+=1){
+              jm=breaks[i]; jump=jm-jp;
+              if(jy<jm) break;
+              leapJ = leapJ + jdiv(jump,33)*8 + jdiv(jmod(jump,33),4);
+              jp=jm;
+            }
+            n = jy - jp;
+            leapJ = leapJ + jdiv(n,33)*8 + jdiv(jmod(n,33)+3,4);
+            if(jmod(jump,33)===4 && jump-n===4) leapJ += 1;
+            const leapG = jdiv(gy,4) - jdiv((jdiv(gy,100)+1)*3,4) - 150;
+            const march = 20 + leapJ - leapG;
+            if(jump-n<6) n = n - jump + jdiv(jump+4,33)*33;
+            leap = jmod(jmod(n+1,33)-1,4);
+            if(leap===-1) leap=4;
+            return { leap, gy, march };
+          }
+          function g2d(gy,gm,gd){
+            let d = jdiv((gy+jdiv(gm-8,6)+100100)*1461,4) + jdiv(153*jmod(gm+9,12)+2,5) + gd - 34840408;
+            d = d - jdiv(jdiv(gy+100100+jdiv(gm-8,6),100)*3,4) + 752;
+            return d;
+          }
+          function d2g(jdn){
+            let j = 4*jdn + 139361631;
+            j = j + jdiv(jdiv(4*jdn+183187720,146097)*3,4)*4 - 3908;
+            const i = jdiv(jmod(j,1461),4)*5 + 308;
+            const gd = jdiv(jmod(i,153),5) + 1;
+            const gm = jmod(jdiv(i,153),12) + 1;
+            const gy = jdiv(j,1461) - 100100 + jdiv(8-gm,6);
+            return { gy, gm, gd };
+          }
+          function j2d(jy,jm,jd){
+            const r = jalCal(jy);
+            return g2d(r.gy,3,r.march) + (jm-1)*31 - jdiv(jm,7)*(jm-7) + jd - 1;
+          }
+          function d2j(jdn){
+            const gy = d2g(jdn).gy;
+            let jy = gy - 621;
+            const r = jalCal(jy);
+            const jdn1f = g2d(gy,3,r.march);
+            let jd, jm, k;
+            k = jdn - jdn1f;
+            if(k>=0){
+              if(k<=185){ jm=1+jdiv(k,31); jd=jmod(k,31)+1; return {jy,jm,jd}; }
+              k -= 186;
+            } else {
+              jy -= 1; k += 179;
+              if(r.leap===1) k += 1;
+            }
+            jm = 7 + jdiv(k,30);
+            jd = jmod(k,30) + 1;
+            return { jy, jm, jd };
+          }
+          function jalaliToGregorian(jy,jm,jd){ return d2g(j2d(jy,jm,jd)); }
+          function gregorianToJalali(gy,gm,gd){ return d2j(g2d(gy,gm,gd)); }
+          const JALALI_MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+          function isoToJalaliText(iso){
+            const [gy,gm,gd] = iso.split('-').map(Number);
+            const j = gregorianToJalali(gy,gm,gd);
+            return `${j.jd} ${JALALI_MONTHS[j.jm-1]} ${j.jy}`;
+          }
+
+          // ---- امتحان‌ها ----
+          function daysUntil(dateStr){
+            const today = new Date(); today.setHours(0,0,0,0);
+            const d = new Date(dateStr+'T00:00:00');
+            return Math.round((d - today) / 86400000);
+          }
+          function addExam(){
+            const kind = document.getElementById('examKind').value;
+            const subj = document.getElementById('examSubject').value.trim();
+            const day = parseInt(document.getElementById('examDay').value, 10);
+            const month = parseInt(document.getElementById('examMonth').value, 10);
+            const year = parseInt(document.getElementById('examYear').value, 10);
+            if(!subj){ showToast('نام درس امتحان رو بنویس.'); return; }
+            if(!day || !month || !year){ showToast('روز، ماه و سال امتحان رو کامل بنویس.'); return; }
+            if(day<1 || day>31 || month<1 || month>12){ showToast('روز یا ماه درست نیست.'); return; }
+            let g;
+            try{ g = jalaliToGregorian(year, month, day); }
+            catch(e){ showToast('این تاریخ معتبر نیست.'); return; }
+            const pad = n => String(n).padStart(2,'0');
+            const date = `${g.gy}-${pad(g.gm)}-${pad(g.gd)}`;
+            exams.push({ id: Date.now()+''+Math.floor(Math.random()*1000), subject: subj, date: date, kind: kind });
+            exams.sort((a,b)=> a.date.localeCompare(b.date));
+            document.getElementById('examSubject').value='';
+            document.getElementById('examDay').value='';
+            document.getElementById('examMonth').value='';
+            document.getElementById('examYear').value='';
+            saveAll();
+            renderExams();
+          }
+          function removeExam(id){
+            showConfirm('مطمئنی می‌خوای این امتحان رو پاک کنی؟', ()=>{
+              exams = exams.filter(e=> e.id!==id);
+              saveAll();
+              renderExams();
+            });
+          }
+          function renderExams(){
+            const el = document.getElementById('examList');
+            if(exams.length===0){ el.innerHTML = '<p class="sub" style="padding:4px 2px">هنوز امتحانی ثبت نکردی.</p>'; return; }
+            el.innerHTML = exams.map(e=>{
+              const label = e.kind==='oral' ? 'پرسش شفاهی' : 'امتحان';
+              const left = daysUntil(e.date);
+              let statusText, statusColor;
+              if(left < 0){ statusText='گذشته'; statusColor='var(--muted)'; }
+              else if(left === 0){ statusText=`امروز ${label}ه! موفق باشی 🌿`; statusColor='var(--accent)'; }
+              else if(left === 1){ statusText=`فردا ${label} داری`; statusColor='var(--accent)'; }
+              else { statusText=`${left} روز مونده`; statusColor='var(--muted)'; }
+              return `<div class="card" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+                <div>
+                  <div style="font-weight:600">${escapeHtml(e.subject)} <span class="sub" style="font-weight:400">· ${label}</span></div>
+                  <div class="sub" style="margin:4px 0 0">${isoToJalaliText(e.date)} · <span style="color:${statusColor}">${statusText}</span></div>
+                </div>
+                <span onclick="removeExam('${e.id}')" style="cursor:pointer;font-size:1.2rem;color:var(--muted);flex-shrink:0">×</span>
+              </div>`;
+            }).join('');
+          }
+
+          function renderScheduleEditor(){
+            const el = document.getElementById('scheduleEditor');
+            el.innerHTML = '';
+            DAYS.forEach(day=>{
+              const block = document.createElement('div');
+              block.className='day-row';
+              const chipsHtml = schedule[day].map((e,i)=>
+                `<div class="chip">${escapeHtml(entryLabel(e))}<span onclick="removeSubject('${day}',${i})">×</span></div>`
+              ).join('');
+              block.innerHTML = `
+                <div class="name">${day}</div>
+                <div class="chips">${chipsHtml}</div>
+              `;
+              el.appendChild(block);
+
+              const inputRow = document.createElement('div');
+              inputRow.className='day-input';
+              inputRow.style.marginRight='86px';
+              inputRow.style.marginBottom='14px';
+              inputRow.innerHTML = `
+                <select id="mode-${day}" onchange="document.getElementById('inp2-${day}').style.display = this.value==='alt' ? 'block' : 'none'">
+                  <option value="normal">عادی</option>
+                  <option value="alt">متناوب (هفته درمیان)</option>
+                </select>
+                <input type="text" placeholder="نام درس" id="inp-${day}">
+                <input type="text" placeholder="نام درس (هفته دوم)" id="inp2-${day}" style="display:none">
+                <button class="btn-ghost" onclick="addSubject('${day}')">افزودن</button>
+              `;
+              el.appendChild(inputRow);
+            });
+          }
+          function addSubject(day){
+            const mode = document.getElementById('mode-'+day).value;
+            const inp = document.getElementById('inp-'+day);
+            const val = inp.value.trim();
+            if(!val) return;
+            if(mode==='alt'){
+              const inp2 = document.getElementById('inp2-'+day);
+              const val2 = inp2.value.trim();
+              if(!val2){ showToast('نام درس هفته دوم رو هم بنویس.'); return; }
+              schedule[day].push({alt:[val, val2]});
+              inp2.value='';
+            } else {
+              schedule[day].push(val);
+            }
+            inp.value='';
+            saveAll();
+            renderScheduleEditor();
+            renderSubjectSelect();
+            renderWeek();
+          }
+          function removeSubject(day, idx){
+            const entry = schedule[day][idx];
+            const label = typeof entry==='string' ? entry : entry.alt.join(' / ');
+            showConfirm(`مطمئنی می‌خوای «${label}» رو از ${day} پاک کنی؟`, ()=>{
+              schedule[day].splice(idx,1);
+              saveAll();
+              renderScheduleEditor();
+              renderSubjectSelect();
+              renderWeek();
+            });
+          }
+
+          // ---- Add homework ----
+          function allSubjects(){
+            const set = new Set();
+            DAYS.forEach(d=> schedule[d].forEach(e=>{
+              if(typeof e==='string') set.add(e);
+              else { set.add(e.alt[0]); set.add(e.alt[1]); }
+            }));
+            return [...set];
+          }
+          function renderSubjectSelect(){
+            const sel = document.getElementById('hwSubject');
+            const subs = allSubjects();
+            sel.innerHTML = subs.length
+              ? subs.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')
+              : `<option value="">ابتدا در «برنامه درسی» درس اضافه کن</option>`;
+          }
+          function nearestDayFor(subject){
+            const now = new Date();
+            const afterCutoff = (now.getHours() > 15) || (now.getHours()===15 && now.getMinutes()>=30);
+            const startOffset = afterCutoff ? 1 : 0; // اگه بعد از ۳:۳۰ عصره، امروز دیگه حساب نمی‌شه
+            for(let offset=startOffset; offset<startOffset+14; offset++){ // تا دو هفته جلو، برای درس‌های چرخشی
+              const date = addDays(now, offset);
+              const day = DAYS[persianDayIndex(date)];
+              const parity = parityOf(date);
+              const matches = schedule[day].some(e=>
+                typeof e==='string' ? e===subject : (parity===0 ? e.alt[0] : e.alt[1])===subject
+              );
+              if(matches) return day;
+            }
+            return null;
+          }
+          function addHomework(){
+            const subject = document.getElementById('hwSubject').value;
+            const text = document.getElementById('hwText').value.trim();
+            if(!subject){ showToast('اول یه درس به برنامه هفتگی اضافه کن.'); return; }
+            if(!text){ showToast('متن تکلیف رو بنویس.'); return; }
+            const day = nearestDayFor(subject);
+            if(!day){ showToast('این درس توی برنامه هفتگی نیست.'); return; }
+            homeworks.push({ id: Date.now()+''+Math.random(), subject, text, day, done:false, createdAt: Date.now() });
+            saveAll();
+            document.getElementById('hwText').value='';
+            document.querySelector('.tab[data-tab="week"]').click();
+            renderWeek();
+          }
+          function toggleDone(id){
+            const h = homeworks.find(x=>x.id===id);
+            if(h){ h.done = !h.done; saveAll(); renderWeek(); }
+          }
+          function deleteHw(id){
+            homeworks = homeworks.filter(x=>x.id!==id);
+            saveAll();
+            renderWeek();
+          }
+
+          // ---- Week view ----
+          function renderWeek(){
+            const el = document.getElementById('view-week');
+            const now = new Date();
+            const t = persianDayIndex(now);
+            const afterCutoff = (now.getHours() > 15) || (now.getHours()===15 && now.getMinutes()>=30);
+            const startIdx = afterCutoff ? (t+1)%7 : t;
+            const startLabel = afterCutoff ? 'فردا' : 'امروز';
+            const parity = parityOf(now);
+
+            let examBanner = '';
+            const upcoming = exams.filter(e=>{ const d = daysUntil(e.date); return d>=0 && d<=5; })
+                                   .sort((a,b)=> daysUntil(a.date)-daysUntil(b.date));
+            if(upcoming.length){
+              examBanner = '<div class="card" style="margin-bottom:14px;border-color:var(--accent)">' +
+                upcoming.map(e=>{
+                  const label = e.kind==='oral' ? 'پرسش شفاهی' : 'امتحان';
+                  const d = daysUntil(e.date);
+                  const txt = d===0 ? `امروز ${label} ${escapeHtml(e.subject)} داری! موفق باشی 🌿` : `${d} روز تا ${label} ${escapeHtml(e.subject)}`;
+                  return `<div style="color:var(--accent);font-weight:600">${txt}</div>`;
+                }).join('') + '</div>';
+            }
+
+            const visibleDays = DAYS.filter((day, idx) => idx >= startIdx && schedule[day].length>0);
+            const hasPendingNextWeek = DAYS.some((day, idx)=>{
+              if(idx >= startIdx) return false;
+              let diff = (idx - t + 7) % 7;
+              if(diff===0) diff = 7;
+              const nextParity = parityOf(addDays(now, diff));
+              return schedule[day].some(entry=>{
+                if(typeof entry==='string') return homeworks.some(h=>h.day===day && h.subject===entry && !h.done);
+                const expected = nextParity===0 ? entry.alt[0] : entry.alt[1];
+                return homeworks.some(h=>h.day===day && h.subject===expected && !h.done);
+              });
+            });
+            if(visibleDays.length===0 && !hasPendingNextWeek){
+              const hasAny = DAYS.some(d=>schedule[d].length>0);
+              el.innerHTML = examBanner + (hasAny
+                ? `<div class="card"><p class="empty-note">برای این هفته روز دیگه‌ای باقی نمونده. آخر هفته خوبی داشته باشی 🌿</p></div>`
+                : `<div class="card"><p class="empty-note">هنوز برنامه درسی وارد نکردی. برو تب «برنامه درسی».</p></div>`);
+              return;
+            }
+            let html='';
+            DAYS.forEach((day, idx)=>{
+              if(idx < startIdx) return;
+              if(schedule[day].length===0) return;
+              const badge = idx===startIdx ? `<span class="today-badge">${startLabel}</span>` : '';
+              html += `<div class="day-block"><div class="day-title">${day} ${badge}</div>`;
+              schedule[day].forEach(entry=>{
+                let subject;
+                if(typeof entry==='string'){
+                  subject = entry;
+                } else {
+                  const [optA, optB] = entry.alt;
+                  const hwA = homeworks.find(h=>h.day===day && h.subject===optA && !h.done);
+                  const hwB = homeworks.find(h=>h.day===day && h.subject===optB && !h.done);
+                  subject = hwA ? optA : hwB ? optB : (parity===0 ? optA : optB);
+                }
+                html += subjItemHtml(day, subject);
+              });
+              html += `</div>`;
+            });
+
+            // روزهایی که توی همین هفته دیگه دیده نمی‌شن، ولی براشون از قبل تکلیفی برای هفتهٔ بعد ثبت شده
+            let nextWeekHtml='';
+            DAYS.forEach((day, idx)=>{
+              if(idx >= startIdx) return;
+              if(schedule[day].length===0) return;
+              // تاریخ نزدیک‌ترین وقوع بعدی این روز از هفته (همیشه هفتهٔ بعد، چون امسال هفته گذشته)
+              let diff = (idx - t + 7) % 7;
+              if(diff===0) diff = 7;
+              const nextDate = addDays(now, diff);
+              const nextParity = parityOf(nextDate);
+
+              const pendingSubjects = [];
+              schedule[day].forEach(entry=>{
+                if(typeof entry==='string'){
+                  if(homeworks.some(h=>h.day===day && h.subject===entry && !h.done)) pendingSubjects.push(entry);
+                } else {
+                  const expected = nextParity===0 ? entry.alt[0] : entry.alt[1];
+                  if(homeworks.some(h=>h.day===day && h.subject===expected && !h.done)) pendingSubjects.push(expected);
+                }
+              });
+              if(pendingSubjects.length===0) return;
+              nextWeekHtml += `<div class="day-block"><div class="day-title">${day} <span class="today-badge" style="background:var(--muted)">هفته بعد</span></div>`;
+              pendingSubjects.forEach(subject=>{ nextWeekHtml += subjItemHtml(day, subject); });
+              nextWeekHtml += `</div>`;
+            });
+            if(nextWeekHtml) html += nextWeekHtml;
+
+            el.innerHTML = examBanner + html;
+          }
+
+          function subjItemHtml(day, subject){
+            const hw = homeworks.filter(h=>h.day===day && h.subject===subject && !h.done)
+                                 .sort((a,b)=>b.createdAt-a.createdAt)[0];
+            return `<div class="subj-item">
+              <div>
+                <div class="sname">${escapeHtml(subject)}</div>
+                <div class="hw ${hw?'':'empty'}">${hw ? escapeHtml(hw.text) : '-'}</div>
+              </div>
+              ${hw ? `
+                <div style="display:flex;gap:6px;align-items:center">
+                  <span class="done-check" title="انجام شد" onclick="toggleDone('${hw.id}')">✅</span>
+                  <button class="btn-danger" onclick="deleteHw('${hw.id}')">حذف</button>
+                </div>` : ''}
+            </div>`;
+          }
+
+          function escapeHtml(s){
+            return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+          }
+
+          function renderNotes(){
+            const el = document.getElementById('view-notes');
+            const subs = allSubjects();
+            if(subs.length===0){
+              el.innerHTML = `<div class="card"><p class="empty-note">اول یه درس به برنامه هفتگی اضافه کن.</p></div>`;
+              return;
+            }
+            el.innerHTML = subs.map(s=>{
+              const locked = !!noteLocks[s];
+              return `
+              <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <h2 style="margin:0">${escapeHtml(s)}</h2>
+                  <span class="lock-toggle" data-subject="${escapeHtml(s)}" onclick="toggleLock(this)" style="cursor:pointer;font-size:1.15rem" title="${locked?'قفل است - برای باز کردن بزن':'برای قفل کردن بزن'}">${locked?'🔒':'🔓'}</span>
+                </div>
+                <textarea style="min-height:90px" data-subject="${escapeHtml(s)}" oninput="saveNote(this)" ${locked?'readonly':''} placeholder="یادداشت برای ${escapeHtml(s)}...">${escapeHtml(notes[s]||'')}</textarea>
+              </div>`;
+            }).join('');
+          }
+          function toggleLock(el){
+            const subject = el.dataset.subject;
+            noteLocks[subject] = !noteLocks[subject];
+            saveAll();
+            renderNotes();
+          }
+          function saveNote(el){
+            if(noteLocks[el.dataset.subject]) return;
+            notes[el.dataset.subject] = el.value;
+            saveAll();
+          }
+
+          renderScheduleEditor();
+          renderSubjectSelect();
+          renderWeek();
+          applyPendingDoneFromNative();
+          syncNativeNotifications();
+          </script>
+          </body>
+          </html>
+          PROJFILEEOF
           base64 -d icon_b64.txt > app/src/main/res/mipmap-hdpi/ic_launcher.png
           cp app/src/main/res/mipmap-hdpi/ic_launcher.png app/src/main/res/mipmap-hdpi/ic_launcher_round.png
       - uses: actions/setup-java@v4
